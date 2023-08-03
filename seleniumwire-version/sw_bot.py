@@ -12,16 +12,15 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from constants import *
 
-'''
-Initialize a Post object.
-Args:
-    link (str): The link to the post.
-    likes (int): Number of likes on the post.
-    comments (int): Number of comments on the post.
-    date_of_pub (str): Date of publication in ISO format.
-
-'''
 class Post:
+    '''
+    Initialize a Post object.
+    Args:
+        link (str): The link to the post.
+        likes (int): Number of likes on the post.
+        comments (int): Number of comments on the post.
+        date_of_pub (str): Date of publication in ISO format.
+    '''
     def __init__(self, link, likes, comments, date_of_pub):
         self.link = link
         self.likes = likes
@@ -36,28 +35,27 @@ class Post:
             f"\tdate of publication: {self.date_of_pub}"
         )
 
-    '''
-    Convert Post object to a dictionary.
-    Returns:
-        dict: Dictionary representation of the Post object.
-
-    '''
     def to_dict(self):
+        '''
+        Convert Post object to a dictionary.
+        Returns:
+            dict: Dictionary representation of the Post object.
+        '''
         return {
             "link": self.link,
             "likes": self.likes,
             "comments": self.comments,
             "date_of_pub": self.date_of_pub
         }
-'''
-Initialize an Account object.
-Args:
-    followers (int): Number of followers for the account.
-    link (str): The link to the account.
-    username (str): The username of the account.
 
-'''
 class Account:
+    '''
+    Initialize an Account object.
+    Args:
+        followers (int): Number of followers for the account.
+        link (str): The link to the account.
+        username (str): The username of the account.
+    '''
     def __init__(self, followers, link, username):
         self.posts = []
         self.followers = followers
@@ -73,15 +71,14 @@ class Account:
             f"posts =\n{posts_str}"
         )
 
-    '''
-    Append a Post object to the Account's list of posts.
-    Args:
-        post (Post): The Post object to be added.
-    Raises:
-        ValueError: If the input is not a Post object.
-
-    '''
     def append_post(self, post):
+        '''
+        Append a Post object to the Account's list of posts.
+        Args:
+            post (Post): The Post object to be added.
+        Raises:
+            ValueError: If the input is not a Post object.
+        '''
         if isinstance(post, Post):
             self.posts.append(post)
         else:
@@ -89,13 +86,12 @@ class Account:
                 "Only Post objects can be added to 'posts' attribute."
             )
 
-    '''
-    Convert Account object to a dictionary.
-    Returns:
-        dict: Dictionary representation of the Account object.
-
-    '''
     def to_dict(self):
+        '''
+        Convert Account object to a dictionary.
+        Returns:
+            dict: Dictionary representation of the Account object.
+        '''
         return {
             "followers": self.followers,
             "link": self.link,
@@ -103,14 +99,28 @@ class Account:
             "posts": [post.to_dict() for post in self.posts]
         }
 
-'''
-Log in to Instagram using the provided WebDriver.
-Args:
-    driver (WebDriver): The WebDriver object for interacting with the browser.
-'''
+def handle_cookie_options(driver):
+    '''
+    Handle cookies pop-ups if they appear.
+    Args:
+        driver (WebDriver): The WebDriver object for interacting with the browser.
+    '''
+    try:
+        cookie = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, COOKIE_DECLINE_BUTTON))
+        )
+        cookie.click()
+    except Exception as e:
+        pass
+
 def login_to_instagram(driver):
+    '''
+    Log in to Instagram using the provided WebDriver.
+    Args:
+        driver (WebDriver): The WebDriver object for interacting with the browser.
+    '''
     username = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, USERNAME_INPUT_SELECTOR))
+        EC.element_to_be_clickable((By.CSS_SELECTOR, USERNAME_INPUT_SELECTOR))
     )
     password = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, PASSWORD_INPUT_SELECTOR))
@@ -126,13 +136,12 @@ def login_to_instagram(driver):
     )
     button.click()
 
-'''
-Handle 'Not Now' pop-ups if they appear.
-Args:
-    driver (WebDriver): The WebDriver object for interacting with the browser.
-
-'''
 def handle_not_now_options(driver):
+    '''
+    Handle 'Not Now' pop-ups if they appear.
+    Args:
+        driver (WebDriver): The WebDriver object for interacting with the browser.
+    '''
     try:
         not_now1 = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, NOT_NOW_SELECTOR_1))
@@ -149,16 +158,15 @@ def handle_not_now_options(driver):
     except Exception as e:
         pass
 
-'''
-Get the JSON response from a specific URL.
-Args:
-    driver (WebDriver): The WebDriver object for interacting with the browser.
-    url (str): The URL to get the response from.
-Returns:
-    dict: The JSON response as a Python dictionary.
-
-'''
 def get_response_dict(driver, url):
+    '''
+    Get the JSON response from a specific URL.
+    Args:
+        driver (WebDriver): The WebDriver object for interacting with the browser.
+        url (str): The URL to get the response from.
+    Returns:
+        dict: The JSON response as a Python dictionary.
+    '''
     request = driver.wait_for_request(url, 10)
     time.sleep(2)
     response = request.response
@@ -170,14 +178,13 @@ def get_response_dict(driver, url):
 
     return response_decoded
 
-'''
-Convert scraped data to CSV format and save it to a file.
-Args:
-    data_dict (dict): A dictionary containing scraped data.
-    hashtag (str): The hashtag used for the filename.
-
-'''
 def convert_to_csv(data_dict, hashtag):
+    '''
+    Convert scraped data to CSV format and save it to a file.
+    Args:
+        data_dict (dict): A dictionary containing scraped data.
+        hashtag (str): The hashtag used for the filename.
+    '''
     csv_file = f"{hashtag}.csv"
 
     with open(csv_file, mode = "w", newline = "", encoding = "utf-8") as file:
@@ -204,31 +211,29 @@ def convert_to_csv(data_dict, hashtag):
                     post.date_of_pub
                 ])
 
-'''
-Convert scraped data to JSON format and save it to a file.
-Args:
-    data_dict (dict): A dictionary containing scraped data.
-    hashtag (str): The hashtag used for the filename.
-
-'''
 def convert_to_json(data_dict, hashtag):
+    '''
+    Convert scraped data to JSON format and save it to a file.
+    Args:
+        data_dict (dict): A dictionary containing scraped data.
+        hashtag (str): The hashtag used for the filename.
+    '''
     json_file = f"{hashtag}.json"
 
     with open(json_file, mode = "w", encoding = "utf-8") as file:
-        json.dumps(data_dict, file, indent=4, default=lambda x: x.to_dict())
+        json.dump(data_dict, file, indent=4, default=lambda x: x.to_dict())
 
-'''
-Scrape Instagram posts under a specific hashtag from business accounts.
-Args:
-    driver (WebDriver): The WebDriver object for interacting with the browser.
-    num_accounts (int): The number of business accounts to scrape. 
-                        Default is 10.
-Returns:
-    tuple: A tuple containing the scraped data dictionary, 
-           duration of the scrape, and the number of scrolls.
-
-'''
 def scrape_instagram_posts(driver, num_accounts = 10):
+    '''
+    Scrape Instagram posts under a specific hashtag from business accounts.
+    Args:
+        driver (WebDriver): The WebDriver object for interacting with the browser.
+        num_accounts (int): The number of business accounts to scrape. 
+                            Default is 10.
+    Returns:
+        tuple: A tuple containing the scraped data dictionary, 
+               duration of the scrape, and the number of scrolls.
+    '''
     accounts = {}
     action = ActionChains(driver)
     start_time = time.time()
@@ -248,13 +253,41 @@ def scrape_instagram_posts(driver, num_accounts = 10):
             except Exception as e:
                 raise ValueError("The hashtag has no posts!")
         else:
+            '''
+            try locate NEXT_BUTTON_SELECTOR1 (macOS), 
+            if not, try to locate NEXT_BUTTON_SELECTOR2 (windows)
+            if not, it is the last post
+
+            
             try:
-                next_post = WebDriverWait(driver, 10).until(
+                next_post1 = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((
-                        By.CSS_SELECTOR, NEXT_BUTTON_SELECTOR
+                        By.CSS_SELECTOR, NEXT_BUTTON_SELECTOR1
                     ))
                 )
-                next_post.click()
+                next_post1.click()
+                scrolls += 1
+            except Exception as e:
+                try:
+                    next_post2 = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((
+                            By.CSS_SELECTOR, NEXT_BUTTON_SELECTOR2
+                        ))
+                    )
+                    next_post1.click()
+                    scrolls += 1
+                except Exception e:
+                    print("The very last post with entered hashtag was reached!")
+                    break
+            '''
+
+            try:
+                next_post1 = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((
+                        By.CSS_SELECTOR, NEXT_BUTTON_SELECTOR1
+                    ))
+                )
+                next_post1.click()
                 scrolls += 1
             except Exception as e:
                 print("The very last post with entered hashtag was reached!")
@@ -312,13 +345,12 @@ def scrape_instagram_posts(driver, num_accounts = 10):
 
     return accounts, duration, scrolls
 
-'''
-Perform the scraping process for the user-specified hashtag.
-Args:
-    driver (WebDriver): The WebDriver object for interacting with the browser.
-
-'''
 def scrape(driver):
+    '''
+    Perform the scraping process for the user-specified hashtag.
+    Args:
+        driver (WebDriver): The WebDriver object for interacting with the browser.
+    '''
     while True:
         data_files_removed = input(
             "Before scraping again, please ensure you have removed any\n"
@@ -356,24 +388,26 @@ def scrape(driver):
         if choice.lower() != "y":
             break
 
-'''
-Main function to set up WebDriver, log in to Instagram, 
-and start the scraping process.
-
-'''
 def main():
+    '''
+    Main function to set up WebDriver, log in to Instagram, 
+    and start the scraping process.
+    '''
+
+    chrome_options = Options()
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
     '''
     Uncomment the following two lines, 
     and add "options = chrome_options" to the Chrome() arguments, 
     to run this bot in headless mode.
-
     '''
-    # chrome_options = Options()
     # chrome_options.headless = True
 
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(options=chrome_options)
     driver.get(BASE_URL)
 
+    handle_cookie_options(driver)
     login_to_instagram(driver)
     handle_not_now_options(driver)
 
