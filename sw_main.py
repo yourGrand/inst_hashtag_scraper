@@ -239,7 +239,7 @@ def independent_print(string):
     print(string)
     print()
 
-def scrape_instagram_posts(driver, num_accounts = 10):
+def scrape_instagram_posts(driver, num_accounts = 10, hashtag_2 = ""):
     '''
     Scrape Instagram posts under a specific hashtag from business accounts.
     Args:
@@ -329,7 +329,8 @@ def scrape_instagram_posts(driver, num_accounts = 10):
         # record the account and/or post if the account is buisness
         # and has catergory "Restaurant"
         if user_dict["user"]["is_business"] and \
-                user_dict["user"]["category"] == "Restaurant":
+                user_dict["user"]["category"] == "Restaurant" and \
+                f"#{hashtag_2}" in media_dict["items"][0]["caption"]["text"]:
 
             username = user_dict["user"]["username"]
             user_link = username_link.get_attribute('href')
@@ -372,6 +373,7 @@ def scrape(driver):
         driver (WebDriver): The WebDriver object for interacting with the browser.
     '''
     while True:
+        # Warn user to remove previously scraped data files from the directory
         data_files_removed = input(
             "Before scraping again, please ensure you have removed any\n"
             "previously scraped data files from the directory.\n"
@@ -388,12 +390,17 @@ def scrape(driver):
             independent_print("Please remove the data files first before continuing.")
             continue
 
-        hashtag = input("Enter the hashtag without '#': ")
+        # Validate user's hashtag inputs
+        hashtag, hashtag_2 = "#", "#"
+        while "#" in hashtag and "#" in hashtag_2:
+            hashtag = input("Enter the main hashtag without '#': ")
+            hashtag_2 = input("Enter the secondary hashtag without '#': ")
+
         driver.get(f"{BASE_URL}/explore/tags/{hashtag}/")
 
         num_accounts = int(input("Number of business accounts to scrape: "))
         accounts, total_duration, num_of_scrolls = scrape_instagram_posts(
-            driver, num_accounts
+            driver, num_accounts, hashtag_2
         )
 
         convert_to_csv(accounts, hashtag)
@@ -428,7 +435,7 @@ def main():
 
     handle_cookie_options(driver)
     login_to_instagram(driver)
-    #handle_not_now_options(driver)
+    # handle_not_now_options(driver)
 
     scrape(driver)
 
