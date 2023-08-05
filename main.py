@@ -119,10 +119,19 @@ def handle_cookie_options(driver):
 
 def login_to_instagram(driver):
     '''
-    Log in to Instagram using the provided WebDriver.
+    Handle cookies if needed. Log in to Instagram using the provided WebDriver.
     Args:
         driver (WebDriver): The WebDriver object for interacting with the browser.
     '''
+    # Validate user's cookies choice
+    cookies_option = get_validated_input(
+        "Handle cookies? (y/n): ", validate_yes_or_no
+    )
+
+    if cookies_option == "y":
+        handle_cookie_options
+
+    # Login
     username = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, USERNAME_INPUT_SELECTOR))
     )
@@ -140,6 +149,7 @@ def login_to_instagram(driver):
     )
     button.click()
 
+# UNUSED
 def handle_not_now_options(driver):
     '''
     Handle 'Not Now' pop-ups if they appear.
@@ -239,6 +249,7 @@ def independent_print(string):
     print(string)
     print()
 
+
 def scrape_instagram_posts(driver, num_accounts = 10, hashtag_2 = ""):
     '''
     Scrape Instagram posts under a specific hashtag from business accounts.
@@ -269,34 +280,6 @@ def scrape_instagram_posts(driver, num_accounts = 10, hashtag_2 = ""):
             except Exception as e:
                 raise ValueError("The hashtag has no posts!")
         else:
-            '''
-            try locate NEXT_BUTTON_SELECTOR1 (macOS), 
-            if not, try to locate NEXT_BUTTON_SELECTOR2 (windows)
-            if not, it is the last post
-
-            
-            try:
-                next_post1 = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((
-                        By.CSS_SELECTOR, NEXT_BUTTON_SELECTOR1
-                    ))
-                )
-                next_post1.click()
-                scrolls += 1
-            except Exception as e:
-                try:
-                    next_post2 = WebDriverWait(driver, 10).until(
-                        EC.element_to_be_clickable((
-                            By.CSS_SELECTOR, NEXT_BUTTON_SELECTOR2
-                        ))
-                    )
-                    next_post1.click()
-                    scrolls += 1
-                except Exception e:
-                    print("The very last post with entered hashtag was reached!")
-                    break
-            '''
-
             try:
                 next_post1 = WebDriverWait(driver, 10).until(
                     EC.element_to_be_clickable((
@@ -306,7 +289,9 @@ def scrape_instagram_posts(driver, num_accounts = 10, hashtag_2 = ""):
                 next_post1.click()
                 scrolls += 1
             except Exception as e:
-                independent_print("The very last post with entered hashtag was reached!")
+                independent_print(
+                    "The very last post with entered hashtag was reached!"
+                )
                 break
 
         # if publication is collaborative, skip it.
@@ -366,6 +351,59 @@ def scrape_instagram_posts(driver, num_accounts = 10, hashtag_2 = ""):
 
     return accounts, duration, scrolls
 
+def get_validated_input(prompt, validator_func):
+    '''
+    Prompt the user for input, validate it using the provided validator function,
+    and keep prompting until valid input is received.
+    Args:
+        prompt (str): The message to display to the user as a prompt for input.
+        validator_func (function): A function that takes a user input as a string
+                                   and returns True if the input is valid, False otherwise.
+    Returns:
+        str: The user's valid input that passed the validation.
+    '''
+    while True:
+        user_input = input(prompt)
+        if validator_func(user_input):
+            return user_input
+        independent_print("Invalid input. Please try again.")
+
+def validate_yes_or_no(input_str):
+    '''
+    Validate a user's input to check if it is either 'y' or 'n' (case-insensitive).
+    Args:
+        input_str (str): The user's input as a string.
+    Returns:
+        bool: True if the input is either 'y' or 'n', False otherwise.
+    '''
+    return input_str.lower() in ["y", "n"]
+
+
+def validate_hashtag(input_str):
+    '''
+    Validate a user's input to check if it contains a '#' symbol.
+    Args:
+        input_str (str): The user's input as a string.
+    Returns:
+        bool: True if the input does not contain a '#', False otherwise.
+    '''
+    return "#" not in input_str
+
+
+def validate_integer(input_str):
+    '''
+    Validate a user's input to check if it can be converted to an integer.
+    Args:
+        input_str (str): The user's input as a string.
+    Returns:
+        bool: True if the input can be converted to an integer, False otherwise.
+    '''
+    try:
+        int(input_str)
+        return True
+    except ValueError:
+        return False
+
 def scrape(driver):
     '''
     Perform the scraping process for the user-specified hashtag.
@@ -374,31 +412,36 @@ def scrape(driver):
     '''
     while True:
         # Warn user to remove previously scraped data files from the directory
-        data_files_removed = input(
+        data_files_removed = get_validated_input(
             "Before scraping again, please ensure you have removed any\n"
             "previously scraped data files from the directory.\n"
-            "Have you removed the data files? (y/n): "
+            "Have you removed the data files? (y/n): ",
+            validate_yes_or_no,
         )
-        
-        while data_files_removed.lower() not in ["y", "n"]:
-            independent_print("Invalid input. Please enter 'y' or 'n'.")
-            data_files_removed = input(
-                "Have you removed the data files? (y/n): "
-            )
 
         if data_files_removed.lower() == "n":
-            independent_print("Please remove the data files first before continuing.")
+            independent_print(
+                "Please remove the data files first before continuing."
+            )
             continue
 
         # Validate user's hashtag inputs
-        hashtag, hashtag_2 = "#", "#"
-        while "#" in hashtag and "#" in hashtag_2:
-            hashtag = input("Enter the main hashtag without '#': ")
-            hashtag_2 = input("Enter the secondary hashtag without '#': ")
+        hashtag = get_validated_input(
+            "Enter the main hashtag without '#': ", validate_hashtag
+        )
+        hashtag_2 = get_validated_input(
+            "Enter the secondary hashtag without '#': ", validate_hashtag
+        )
 
         driver.get(f"{BASE_URL}/explore/tags/{hashtag}/")
 
-        num_accounts = int(input("Number of business accounts to scrape: "))
+        # Validate user's integer input
+        num_accounts = int(
+            get_validated_input(
+                "Number of business accounts to scrape: ", validate_integer
+            )
+        )
+
         accounts, total_duration, num_of_scrolls = scrape_instagram_posts(
             driver, num_accounts, hashtag_2
         )
@@ -423,9 +466,11 @@ def main():
     '''
 
     chrome_options = Options()
-    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    chrome_options.add_experimental_option(
+        'excludeSwitches', 
+        ['enable-logging']
+    )
 
-    
     # Uncomment the following line,  
     # to run this bot in headless mode.
     # chrome_options.headless = True    # <-- this one
@@ -433,9 +478,7 @@ def main():
     driver = webdriver.Chrome(options=chrome_options)
     driver.get(BASE_URL)
 
-    handle_cookie_options(driver)
     login_to_instagram(driver)
-    # handle_not_now_options(driver)
 
     scrape(driver)
 
