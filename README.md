@@ -19,7 +19,7 @@ This project is a Python script that allows you to scrape Instagram posts under 
 
 1. Clone the repository to your local machine:
 
-`git clone https://github.com/yourusername/instagram-post-scraper.git`
+`git clone https://github.com/yourGrand/instagram-post-scraper.git`
 
 `cd instagram-post-scraper`
 
