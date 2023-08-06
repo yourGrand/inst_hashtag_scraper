@@ -12,10 +12,13 @@ This project is a Python script that allows you to scrape Instagram posts under 
 ## Installation
 
 1. Clone the repository to your local machine:
-`git clone https://github.com/yourusername/instagram-post-scraper.git
-cd instagram-post-scraper`
+
+`git clone https://github.com/yourusername/instagram-post-scraper.git`
+
+`cd instagram-post-scraper`
 
 2. Install the required Python packages:
+
 `pip install -r requirements.txt`
 
 ## Usage
