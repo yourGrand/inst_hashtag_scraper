@@ -69,7 +69,7 @@ The JSON file will contain a dictionary with usernames as keys and corresponding
 
 ## License
 
-This project is licensed under the GNU General Public License (GPL) - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License (GPL) - see the [LICENSE](LICENSE.txt) file for details.
 
 ## Acknowledgments
 
