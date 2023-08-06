@@ -2,12 +2,18 @@
 
 ## Overview
 
-This project is a Python script that allows you to scrape Instagram posts under a specific hashtag from business accounts in the category "Restaurant." The script uses the Selenium and selenium-wire to interact with the Instagram website and collect data about the posts, including post text, likes, comments, and date of publication.
+This project is a Python script that allows you to scrape Instagram posts under a specific hashtag from business accounts in the category "Restaurant." The script uses [Selenium WebDriver](https://www.selenium.dev/documentation/webdriver/) and [Selenium Wire](https://github.com/wkeeling/selenium-wire) to interact with the Instagram website and collect data about the posts, including post text, likes, comments, and date of publication.
 
 ## Requirements
 
 - Python 3.x
 - Google Chrome web browser
+
+### Disclaimer
+
+- This script has been tested and verified to work on macOS Ventura 13.4.1. While it may work on other operating systems, we cannot guarantee full compatibility. Use it on other platforms at your own risk.
+
+- This project is intended for educational and personal use only. Scraping data from websites without permission may violate their terms of service. Use this script responsibly and at your own risk.
 
 ## Installation
 
@@ -21,19 +27,21 @@ This project is a Python script that allows you to scrape Instagram posts under 
 
 `pip install -r requirements.txt`
 
+3. Consider installing Selenium Wire's root certificate or your own root certificate to get rid of the "Not Secure" message and/or unlocked padlock in the address bar. You can read more about certificates and how to install them in the [Selenium Wire documentation](https://github.com/wkeeling/selenium-wire#certificates).
+
 ## Usage
 
 1. Run the `main.py` script:
 
 2. The script will prompt you to handle cookies and log in to Instagram using your username and password.
 
-3. Enter the main hashtag and the secondary hashtag to search for in the post captions.
+3. Enter the main and secondary hashtags to search for in the post captions.
 
 4. Specify the number of business accounts you want to scrape.
 
 5. The script will start scraping the posts and display a progress bar with the total number of accounts to scrape.
 
-6. After the scraping process is complete, the data will be saved in CSV and JSON formats with filenames based on the hashtags.
+6. After the scraping process, the data will be saved in CSV and JSON formats with filenames based on the hashtags.
 
 7. The script will also display the total duration of the scraping process and the number of posts scrolled.
 
@@ -61,11 +69,7 @@ The JSON file will contain a dictionary with usernames as keys and corresponding
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
-
-## Disclaimer
-
-This project is intended for educational and personal use only. Scraping data from websites without permission may violate their terms of service. Use this script responsibly and at your own risk.
+This project is licensed under the GNU General Public License (GPL) - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
@@ -74,3 +78,4 @@ This project was inspired by the need to collect data for research purposes. Spe
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
