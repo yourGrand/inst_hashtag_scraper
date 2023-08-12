@@ -137,49 +137,72 @@ def convert_to_json(data_dict, hashtag):
     json_file = f"{hashtag}.json"
 
     with open(json_file, mode = "w", encoding = "utf-8") as file:
-        json.dump(data_dict, file, indent=4, default=lambda x: x.to_dict())
+        json.dump(data_dict, file, indent = 4, default = lambda x: x.to_dict())
 
-def response_parser(user, media, hashtag, date, link, accounts, pb, driver):
+def response_parser(user, media, hashtag, main_category, backup_category, date, link, accounts, progress_bar, driver):
     '''
     Parse the JSON response to record business accounts' posts 
-    under a specific hashtag.
+    under a specific hashtag, considering specified business categories.
 
     Args:
         user (dict): The JSON response containing user data.
         media (dict): The JSON response containing media data.
         hashtag (str): The secondary hashtag to search for in the post caption.
+        main_category (str): The main business category to filter accounts.
+        backup_category (str): The backup business category to use if the main 
+                               category isn't triggered.
         date (WebElement): The date of publication WebElement object.
         link (WebElement): The username link WebElement object.
         accounts (dict): A dictionary to store Account objects.
-        pb (tqdm.tqdm): The tqdm progress bar for tracking
+        progress_bar (tqdm.tqdm): The tqdm progress bar for tracking
                         the number of accounts scraped.
         driver (WebDriver): The WebDriver object for 
                             interacting with the browser.
     '''
-    # Record the account and/or post if the account is buisness
-    # and has catergory "Restaurant"
-    if user["user"]["is_business"] and \
-            user["user"]["category"] == "Restaurant" and \
-            f"#{hashtag}" in media["items"][0]["caption"]["text"]:
 
-        username = user["user"]["username"]
-        user_link = link.get_attribute('href')
-        followers = user["user"]["follower_count"]
+    # Check if the user's category matches the main category or
+    # no main category is specified.
+    def is_valid_main_category(user_cat):
+        return not main_category or user_cat == main_category
 
-        date_of_pub = date.get_attribute('datetime')
-        likes = media["items"][0]["like_count"]
-        comments = media["items"][0]["comment_count"]
-        text = media["items"][0]["caption"]["text"]
-        post_link = driver.current_url
+    # Check if the user's category matches the backup category and 
+    # it's necessary to use the backup category.
+    def is_valid_backup_category(user_cat):
+        return backup_category and user_cat == backup_category
 
-        if username in accounts:
-            accounts[username].append_post(
-                Post(text, post_link, likes, comments, date_of_pub)
-            )
-        else:
-            profile = Account(followers, user_link, username)
-            profile.append_post(
-                Post(text, post_link, likes, comments, date_of_pub)
-            )
-            accounts[username] = profile
-            pb.update(1)
+    # Check if the specified hashtag is present in the post caption.
+    def is_hashtag_present():
+        return not hashtag or f"#{hashtag}" in media["items"][0]["caption"]["text"]
+
+    user_category = user["user"]["category"]
+
+    if user["user"]["is_business"]:
+        user_belongs_to_main_category = is_valid_main_category(user_category)
+        user_belongs_to_backup_category = is_valid_backup_category(user_category)
+        is_hashtag_valid = is_hashtag_present()
+
+        if user_belongs_to_main_category or \
+            (user_belongs_to_backup_category and \
+                not user_belongs_to_main_category) and \
+            is_hashtag_valid:   
+                username = user["user"]["username"]
+                user_link = link.get_attribute('href')
+                followers = user["user"]["follower_count"]
+
+                date_of_pub = date.get_attribute('datetime')
+                likes = media["items"][0]["like_count"]
+                comments = media["items"][0]["comment_count"]
+                text = media["items"][0]["caption"]["text"]
+                post_link = driver.current_url
+
+                if username in accounts:
+                    accounts[username].append_post(
+                        Post(text, post_link, likes, comments, date_of_pub)
+                    )
+                else:
+                    profile = Account(followers, user_link, username)
+                    profile.append_post(
+                        Post(text, post_link, likes, comments, date_of_pub)
+                    )
+                    accounts[username] = profile
+                    progress_bar.update(1)

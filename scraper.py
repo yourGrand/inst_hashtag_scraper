@@ -34,7 +34,7 @@ def login_to_instagram(driver):
     '''
     # Validate user's cookies choice
     cookies_option = get_validated_input(
-        "Handle cookies? (y/n): ", validate_yes_or_no
+        "\nHandle cookies? (y/n): ", validate_yes_or_no
     )
 
     if cookies_option == "y":
@@ -112,13 +112,16 @@ def independent_print(string):
     print()
 
 
-def scrape_instagram_posts(driver, num_accounts = 10, hashtag_2 = ""):
+def scrape_instagram_posts(driver, num_accounts = 10, hashtag = "", main_category = "", backup_category = ""):
     '''
     Scrape Instagram posts under a specific hashtag from business accounts.
     Args:
         driver (WebDriver): The WebDriver object for interacting with the browser.
         num_accounts (int): The number of business accounts to scrape. 
                             Default is 10.
+        hashtag (str): Secondary hashtag to filter users' accounts
+        main_category (str): Main category of business accounts to filter
+        backup_category (str): Secondary category of business accounts to filter
     Returns:
         tuple: A tuple containing the scraped data dictionary, 
                duration of the scrape, and the number of scrolls.
@@ -183,7 +186,9 @@ def scrape_instagram_posts(driver, num_accounts = 10, hashtag_2 = ""):
         response_parser(
             user_dict,
             media_dict,
-            hashtag_2,
+            hashtag,
+            main_category,
+            backup_category,
             date,
             username_link,
             accounts,
@@ -255,11 +260,13 @@ def validate_integer(input_str):
 def scrape(driver):
     '''
     Perform the scraping process for the user-specified hashtag.
+    Main user's inputs.
     Args:
         driver (WebDriver): The WebDriver object for interacting with the browser.
     '''
     while True:
         # Warn user to remove previously scraped data files from the directory
+        print()
         data_files_removed = get_validated_input(
             "Before scraping again, please ensure you have removed any\n"
             "previously scraped data files from the directory.\n"
@@ -267,13 +274,14 @@ def scrape(driver):
             validate_yes_or_no,
         )
 
-        if data_files_removed.lower() == "n":
+        if data_files_removed == "n":
             independent_print(
                 "Please remove the data files first before continuing."
             )
             continue
 
         # Validate user's hashtag inputs
+        print()
         hashtag = get_validated_input(
             "Enter the main hashtag without '#': ", validate_hashtag
         )
@@ -281,9 +289,34 @@ def scrape(driver):
             "Enter the secondary hashtag without '#': ", validate_hashtag
         )
 
+        # Handle user's category input
+        print()
+        print(
+            "Warning: Providing a non-existent category could result\n in "
+            "0 scraped accounts and may take a long time.\n"
+            "Please ensure you enter a valid business category"
+            " to get meaningful results.\n"
+        )
+        main_category = input(
+            "Enter main category of business accounts"
+            " to scrape (or leave blank): "
+        )
+        if main_category:
+            backup_category = input(
+                "Enter backup category of business accounts"
+                " to scrape (or leave blank): "
+            )
+        else:
+            backup_category = ""
+
+        main_category = main_category.capitalize()
+        backup_category = backup_category.capitalize()
+        
+
         driver.get(f"{BASE_URL}/explore/tags/{hashtag}/")
 
         # Validate user's integer input
+        print()
         num_accounts = int(
             get_validated_input(
                 "Number of business accounts to scrape: ", validate_integer
@@ -291,7 +324,11 @@ def scrape(driver):
         )
 
         accounts, total_duration, num_of_scrolls = scrape_instagram_posts(
-            driver, num_accounts, hashtag_2
+            driver, 
+            num_accounts, 
+            hashtag_2, 
+            main_category, 
+            backup_category
         )
 
         convert_to_csv(accounts, hashtag)
