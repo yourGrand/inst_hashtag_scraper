@@ -2,7 +2,9 @@
 
 ## Overview
 
-This project is a Python script that allows you to scrape Instagram posts under a specific hashtag from business accounts in the category "Restaurant." The script uses [Selenium WebDriver](https://www.selenium.dev/documentation/webdriver/) and [Selenium Wire](https://github.com/wkeeling/selenium-wire) to interact with the Instagram website and collect data about the posts, including post text, likes, comments, and date of publication.
+## Project Overview
+
+This project involves a Python script designed to scrape Instagram posts. It targets business accounts within a user-defined category by searching for a specific hashtag. To achieve this, the script employs the [Selenium WebDriver](https://www.selenium.dev/documentation/webdriver/) along with [Selenium Wire](https://github.com/wkeeling/selenium-wire). These tools enable interaction with the Instagram website, facilitating the extraction of various post details. The collected data includes post text, likes, comments, and the publication date.
 
 ## Requirements
 
