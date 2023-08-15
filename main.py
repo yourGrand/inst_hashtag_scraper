@@ -17,7 +17,7 @@ def main():
 
     # Uncomment the following line,  
     # to run this bot in headless mode.
-    # chrome_options.headless = True    # <-- this one
+    chrome_options.headless = True    # <-- this one
 
     driver = webdriver.Chrome(options = chrome_options)
     driver.get(BASE_URL)

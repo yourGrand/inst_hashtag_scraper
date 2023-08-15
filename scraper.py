@@ -1,5 +1,6 @@
 import time
 import json
+from getpass import getpass
 from tqdm import tqdm
 from seleniumwire import webdriver
 from seleniumwire.utils import decode
@@ -49,9 +50,9 @@ def login_to_instagram(driver):
     )
 
     username.clear()
-    username.send_keys(input("Enter you username: "))
+    username.send_keys(getpass("Enter you username: "))
     password.clear()
-    password.send_keys(input("Enter you password: "))
+    password.send_keys(getpass("Enter you password: "))
 
     button = WebDriverWait(driver, 2).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, LOGIN_BUTTON_SELECTOR))
