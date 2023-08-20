@@ -31,19 +31,21 @@ This project involves a Python script designed to scrape Instagram posts. It tar
 
 ## Usage
 
-1. Run the `main.py` script:
+1. Run the `main.py` script
 
-2. The script will prompt you to handle cookies and log in to Instagram using your username and password.
+2. The script will prompt you to handle cookies and log in to your Instagram account using your username and password.
 
-3. Enter the main and secondary hashtags to search for in the post captions.
+3. Enter the main and secondary hashtags you'd like to search for. The secondary hashtag will be used to filter posts that also include the main hashtag.
 
-4. Specify the number of business accounts you want to scrape.
+4. Provide the main and backup categories for business accounts. If the main category isn't detected, the script will check for the backup category.
 
-5. The script will start scraping the posts and display a progress bar with the total number of accounts to scrape.
+5. Specify the number of business accounts you intend to scrape data from.
 
-6. After the scraping process, the data will be saved in CSV and JSON formats with filenames based on the hashtags.
+6. The script will begin the scraping process, retrieving posts and related data based on the provided hashtags and business account categories. A progress bar will indicate the number of accounts being scraped.
 
-7. The script will also display the total duration of the scraping process and the number of posts scrolled.
+7. Once the scraping is complete, the collected data will be saved in both CSV and JSON formats. The filenames for these files will be generated based on the hashtags you provided.
+
+8. The script will display the total duration of the scraping process and the count of posts that were scrolled through during the scraping.
 
 ## Data Output
 
